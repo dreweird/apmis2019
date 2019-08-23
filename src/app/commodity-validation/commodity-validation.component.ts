@@ -6,6 +6,7 @@ import {FormBuilder, FormControl, FormGroup, Validators, FormGroupDirective} fro
 import "ag-grid-enterprise";
 import { MatSnackBar } from '@angular/material';
 import {ICellRendererAngularComp} from "ag-grid-angular";
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-commodity-validation',
@@ -178,6 +179,12 @@ context = { componentParent: this };
 
   ngOnInit() {
     this.kinveyStore.getData(this.commodity.name).subscribe(res=>{
+    
+     for(let i=0; i<res.length; i++){
+        let yearWeek = moment(res[i].date_surveyed).year()+'-'+moment(res[i].date_surveyed).week();
+      //  console.log(yearWeek);
+        res[i].yearWeek = yearWeek
+      }
       this.rowData = res;
       console.log(this.rowData);
     })
