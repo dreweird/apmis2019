@@ -1,0 +1,33 @@
+<div class="container">
+  <div class="row justify-content-between" [ngClass]="routeAnimationsElements">
+    <div class="col-md-8">
+      <h1 class="main-heading">Agricultural Commodities</h1>
+    </div>
+    <div class="col-md">
+        <mat-form-field class="example-full-width">
+            <span matPrefix><fa-icon icon="search"></fa-icon>&nbsp;</span>
+            <input #txtSearch matInput placeholder="Search commodity...">
+          </mat-form-field>
+      </div>
+  </div>
+
+  <div class="row align-items-end" >
+      <div *ngFor="let commodity of (commodities | searchfilter: txtSearch.value)" class="col-md-6 col-lg-4" [ngClass]="routeAnimationsElements">
+        <mat-card [ngClass]="routeAnimationsElements">
+            <mat-card-header>
+                <mat-card-title>
+                  {{commodity.name }}
+                  </mat-card-title>
+                  <mat-card-subtitle>
+                    {{ commodity.category}}
+                  </mat-card-subtitle>
+            </mat-card-header>
+            <img class="img" mat-card-image [src]="commodity.imageSrc" [alt]="commodity.name">
+          <mat-card-actions>
+              <button mat-button color="primary" (click)="onClick(commodity)">TABLE & CHARTS</button>
+              <button mat-button color="accent" *ngIf="logService.isUserLoggedIn()" (click)="onValidate(commodity)">DATA VALIDATION</button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+<div class="container">
+    <div class="row" [ngClass]="routeAnimationsElements">
+      <div class="col-md-12 wrapper">
+          <img   [src]="commodity.imageSrc" [alt]="commodity.name">
+        <h1 class="centered">{{commodity.category}} - {{commodity.name}}</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 wrapper">
+        <mat-card [ngClass]="routeAnimationsElements">
+          <h2>Data Collection - (Monthly Basis)</h2>
+          <button mat-raised-button color="primary" (click)="onExport()" >Export to Excel</button>
+          <ag-grid-angular 
+          style="width: 100%; height: 500px;" 
+          class="ag-theme-balham"
+          [rowData]="rowData" 
+          [columnDefs]="columnDefs"
+          [autoGroupColumnDef]="autoGroupColumnDef"
+          (gridReady)="onGridReady($event)"
+          >
+        </ag-grid-angular>
+        </mat-card>
+
+      </div>
+    </div>
+  
+    <div class="row" *ngIf="rowData?.length > 0">
+ 
+        <mat-card [ngClass]="routeAnimationsElements">
+            <mat-form-field class="example-full-width" >
+                <mat-label>Select Area</mat-label>
+                <mat-select [(value)]="selected" (selectionChange)="updateChart($event)">
+                  <mat-option *ngFor="let food of foods" [value]="food.value">
+                    {{food.viewValue}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-spinner *ngIf="loading" style="margin:0 auto;" 
+              mode="indeterminate"></mat-spinner>
+          <div id="chartContainer" style="width: 100%; height: 400px;"></div>
+        </mat-card >
+        <mat-card [ngClass]="routeAnimationsElements">
+          <div id="chartContainer2" style="width: 100%; height: 400px;"></div>
+        </mat-card>
+        <mat-card [ngClass]="routeAnimationsElements"> 
+          <div id="chartContainer3" style="width: 100%; height: 400px;"></div>
+        </mat-card>
+
+
+     
+
+    </div>
+
+
+    </div>
+
