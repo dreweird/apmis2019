@@ -15,25 +15,29 @@ import { groupBy, mergeMap, toArray } from 'rxjs/operators';
 export class CommodityComponent implements OnInit {
 
   routeAnimationsElements = ROUTE_ANIMATIONS_ELEMENTS;
-  commodities = [];
+  commodities: any;
   group_commodity = [];
 
   //emit each person
-  source = from(this.commodities = this.dataItemService.getAllCommodity());
-  example = this.source.pipe(
-    groupBy(data => data.category),
-    // return each item in group as array
-    mergeMap(group => group.pipe(toArray()))
-  );
+  // source = from(this.commodities = this.dataItemService.allCommodity);
+  // example = this.source.pipe(
+  //   groupBy((data: any) => data.category),
+  //   // return each item in group as array
+  //   mergeMap(group => group.pipe(toArray()))
+  // );
   constructor(private router: Router, private dataItemService: DataItemService,
     private logService: BackendService) { }
 
   ngOnInit() {
-    this.commodities = this.dataItemService.getAllCommodity();
-    this.example.subscribe(val => {
-      // console.log(val);
-      this.group_commodity.push(val);
-    });
+    this.dataItemService.getAllCommodity().subscribe(data=>{
+      this.commodities = data;
+      console.log(this.commodities);
+    })
+   
+    // this.example.subscribe(val => {
+    //   // console.log(val);
+    //   this.group_commodity.push(val);
+    // });
    // console.log(this.group_commodity)
   }
 

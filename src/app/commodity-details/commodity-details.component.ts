@@ -84,12 +84,15 @@ onGridReady(params) {
   ngOnInit() {
     this.sub = this.route.params.subscribe(params => {
       this.id = +params['id']; // (+) converts string 'id' to a number
-      this.dataItemService.setSelectedId(this.id);
-      this.commodity = this.dataItemService.getSelected();
-      this.myBackgroundImageUrl = this.commodity.imageSrc;
-     // console.log(this.commodity);
-      this.dataItemService.getItem(this.commodity.name).subscribe(res=>{
 
+      this.dataItemService.getSelected(this.id).subscribe(data=>{
+        this.commodity = data[0];
+        this.myBackgroundImageUrl = this.commodity.imageSrc;
+      });
+  
+  
+      this.dataItemService.getItem(this.id).subscribe(res=>{
+        console.log(res);
         this.rowData = res;
         if(this.rowData.length > 0){
           this.processData(this.selected);
@@ -134,7 +137,8 @@ onGridReady(params) {
 
 
   processData(area){
-    this.dataItemService.get3MosAgo(this.commodity.name, area).subscribe(res=>{
+    console.log(area);
+    this.dataItemService.get3MosAgo(this.id, area).subscribe(res=>{
      console.log(res);
       for(let entry of res){
         this.dataPoints.push({
@@ -143,15 +147,15 @@ onGridReady(params) {
         });
         this.monthAgo.push({
           x: new Date(entry.date_surveyed),
-          y: entry['1mos']
+          y: entry['get1mos']
         });
         this.month3Ago.push({
           x: new Date(entry.date_surveyed),
-          y: entry['3mos']
+          y: entry['get3mos']
         });
         this.yearAgo.push({
           x: new Date(entry.date_surveyed),
-          y: entry['1yr']
+          y: entry['get12mos']
         });
       }
     });

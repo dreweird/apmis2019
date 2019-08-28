@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row" [ngClass]="routeAnimationsElements">
-        <div class="col-md-12 wrapper">
+        <div *ngIf="commodity" class="col-md-12 wrapper">
             <img   [src]="commodity.imageSrc" [alt]="commodity.name">
         <h1 class="centered">{{commodity.category}} - {{commodity.name}}</h1>
         </div>
@@ -21,12 +21,16 @@
   </ag-grid-angular>
 
 </mat-card>
-<mat-card>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 wrapper">
+<mat-card *ngIf="inputForm">
     <h2> {{commodity.name}} - Data Inputting (Monthly Basis)</h2>
     <form [formGroup]="inputForm" #formDirective="ngForm"  >
       <table class="example-full-width" cellspacing="0"><tr>
           <td>
-              <mat-form-field>   
+              <mat-form-field >   
                   <mat-label>Select Province</mat-label>
                   <mat-select formControlName="prov" (selectionChange)="filterArea($event)">
                     <mat-option value="Agusan del Norte">Agusan del Norte</mat-option>
@@ -79,22 +83,8 @@
           </td>
         </tr>
   </table>      
-  
-          
-  
-    
-   
-   
-      <!-- <div class="form-group">
-          <mat-form-field class="example-full-width">
-              <mat-icon matPrefix><fa-icon icon="key"></fa-icon></mat-icon> 
-              <input matInput type="password" placeholder="Password" formControlName="password" required>
-          </mat-form-field>       
-              
-      </div> -->
-    
-      
-      </form>
+     
+</form>
 </mat-card>
         </div>
     </div>

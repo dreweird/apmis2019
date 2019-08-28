@@ -150,26 +150,41 @@ context = { componentParent: this };
     private kinveyStore: BackendService, private snackBar: MatSnackBar) { 
       this.route.params.subscribe(params => {
         this.id = +params['id']; // (+) converts string 'id' to a number
-        this.dataItemService.setSelectedId(this.id);
-        this.commodity = this.dataItemService.getSelected();
-        this.myBackgroundImageUrl = this.commodity.imageSrc;
-        this.dataItemService.getItem(this.commodity.name).subscribe(res=>{
+        this.dataItemService.getSelected(this.id).subscribe(data=>{
+          this.commodity = data[0];
+          this.myBackgroundImageUrl = this.commodity.imageSrc;
+          console.log(this.commodity); 
+          this.inputForm = new FormGroup({
+            prov: new FormControl('', [Validators.required]),
+            area: new FormControl('', [Validators.required]),
+            date_surveyed: new FormControl('', [Validators.required]),
+            price: new FormControl('', [Validators.required]),
+            high: new FormControl('', [Validators.required]),
+            low: new FormControl('', [Validators.required]),
+            category: new FormControl(this.commodity.category),
+            commodity: new FormControl(this.commodity.name),
+            unit: new FormControl('kilo'),
+            id: new FormControl(null)
+          }); 
+
+          console.log(this.inputForm);
+          this.kinveyStore.getData(this.commodity.name).subscribe(res=>{
+    
+            // for(let i=0; i<res.length; i++){
+            //    let yearWeek = moment(res[i].date_surveyed).year()+'-'+moment(res[i].date_surveyed).week();
+            //  //  console.log(yearWeek);
+            //    res[i].yearWeek = yearWeek
+            //  }
+             this.rowData = res;
+             console.log(this.rowData);
+           })
+        });
+        this.dataItemService.getItem(this.id).subscribe(res=>{
             this.rowData2 = res;
             console.log(res);      
           });
      });
-     this.inputForm = new FormGroup({
-      prov: new FormControl('', [Validators.required]),
-      area: new FormControl('', [Validators.required]),
-      date_surveyed: new FormControl('', [Validators.required]),
-      price: new FormControl('', [Validators.required]),
-      high: new FormControl('', [Validators.required]),
-      low: new FormControl('', [Validators.required]),
-      category: new FormControl(this.commodity.category),
-      commodity: new FormControl(this.commodity.name),
-      unit: new FormControl('kilo'),
-      id: new FormControl(null)
-    });
+ 
 
     this.getRowNodeId = function(data) {
       return data.id;
@@ -178,16 +193,7 @@ context = { componentParent: this };
     }
 
   ngOnInit() {
-    this.kinveyStore.getData(this.commodity.name).subscribe(res=>{
-    
-     for(let i=0; i<res.length; i++){
-        let yearWeek = moment(res[i].date_surveyed).year()+'-'+moment(res[i].date_surveyed).week();
-      //  console.log(yearWeek);
-        res[i].yearWeek = yearWeek
-      }
-      this.rowData = res;
-      console.log(this.rowData);
-    })
+
   }
 
   onRemoveSelected(cell) {
@@ -208,7 +214,8 @@ context = { componentParent: this };
 
   editData(cell){
     console.log(cell);
-    let month = cell.date_surveyed.slice(5, -3);
+    let month = cell.date_surveyed.slice(5, -17);
+    console.log(month);
     this.newFilter = this.area;
     this.inputForm.patchValue({
       id: cell.id,
