@@ -131,7 +131,7 @@ onGridReady(params) {
       this.chart2.render();
       this.chart3.render();
       this.loading = false;
-    }, 3500);
+    }, 1500);
 
   }
 
