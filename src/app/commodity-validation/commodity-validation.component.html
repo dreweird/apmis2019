@@ -16,6 +16,9 @@
     class="ag-theme-balham"
     [rowData]="rowData" 
     [columnDefs]="columnDefs"
+    [groupRowAggNodes]="groupRowAggNodes"
+    [groupRemoveSingleChildren]="false"
+    [groupDefaultExpanded]=2
     (gridReady)="onGridReady($event)"
     >
   </ag-grid-angular>
