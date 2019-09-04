@@ -25,6 +25,7 @@ export class CommodityValidationComponent implements OnInit {
   gridApi: any;
   gridApi2: any;
   getRowNodeId: any;
+  getRowNodeIdKinvey: any;
   inputForm: FormGroup;
   rowSelection = "single";
   month = [
@@ -130,7 +131,9 @@ filterArea(event){
     {headerName: 'Low', field: 'low', width: 90},
     {headerName: 'Respondent', field: 'respondent' },
     {headerName: 'Supplier', field: 'supplier' },
-    {headerName: 'Remarks', field: 'remarks' }
+    {headerName: 'Remarks', field: 'remarks' },
+    {delete: 'Remarks', field: 'remarks' },
+    {headerName: 'Action', cellRenderer: 'deleteRenderer', field: 'action'}
 ];
 
 columnDefs2 = [
@@ -143,6 +146,7 @@ columnDefs2 = [
   {headerName: 'Action', cellRenderer: 'actionRenderer', field: 'action'}
 ];
 frameworkComponents = {actionRenderer: ActionRenderer} ;
+frameworkComponents2 =  {deleteRenderer: DeleteRenderer} //kinvey delete
 context = { componentParent: this };
 
 
@@ -166,15 +170,8 @@ context = { componentParent: this };
             unit: new FormControl('kilo'),
             id: new FormControl(null)
           }); 
-
-          console.log(this.inputForm);
           this.kinveyStore.getData(this.commodity.name).subscribe(res=>{
-    
-            // for(let i=0; i<res.length; i++){
-            //    let yearWeek = moment(res[i].date_surveyed).year()+'-'+moment(res[i].date_surveyed).week();
-            //  //  console.log(yearWeek);
-            //    res[i].yearWeek = yearWeek
-            //  }
+
              this.rowData = res;
              console.log(this.rowData);
            })
@@ -187,8 +184,14 @@ context = { componentParent: this };
  
 
     this.getRowNodeId = function(data) {
+     // console.log(data);
       return data.id;
     };
+
+    this.getRowNodeIdKinvey = function(data) {
+      return data._id;
+    };
+
      
     }
 
@@ -200,6 +203,7 @@ context = { componentParent: this };
     var selectedData = this.gridApi2.getSelectedRows();
     var id = selectedData[0].id;
     console.log(selectedData);
+    this.gridApi2.updateRowData({ remove: selectedData});
     if(confirm("Are you sure you want to delete " + cell + "!")){
      this.dataItemService.deleteData(id).subscribe(()=>{
       var res = this.gridApi2.updateRowData({ remove: selectedData});
@@ -210,6 +214,26 @@ context = { componentParent: this };
     }else{
       console.log("false");
     }
+  }
+
+  onRemoveSelectedKinvey(id){
+    var selectedData = this.gridApi.getRowNode(id);
+    console.log(selectedData);
+
+
+    if(confirm("Are you sure you want to delete the data?") ){
+      selectedData.data.id = id;
+      this.gridApi.updateRowData({ remove: [selectedData.data]});
+      this.kinveyStore.deleteData(id).then((result: {}) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });;
+    }
+   
+
+
   }
 
   editData(cell){
@@ -259,6 +283,35 @@ export class ActionRenderer implements ICellRendererAngularComp {
   public invokeParentMethod2() {
    // console.log(this.params);
       this.params.context.componentParent.onRemoveSelected(`Name: ${this.params.data.commodity}, Row: ${this.params.node.rowIndex}`)
+  }
+
+  refresh(): boolean {
+      return false;
+  }
+}
+
+@Component({
+  template: `
+  <button color="warn" *ngIf="!params.node.group" mat-button style="height: 30px"
+  (click)="invokeDeleteParent()" ><fa-icon icon="trash"></fa-icon></button>`,
+  styles: [
+      `.btn {
+          line-height: 0.5
+      }`
+  ]
+})
+export class DeleteRenderer implements ICellRendererAngularComp {
+  public params: any;
+
+  agInit(params: any): void {
+      this.params = params;
+  }
+
+
+
+  public invokeDeleteParent() {
+     console.log(this.params.data._id);
+      this.params.context.componentParent.onRemoveSelectedKinvey(this.params.data._id);
   }
 
   refresh(): boolean {

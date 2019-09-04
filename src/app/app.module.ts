@@ -14,7 +14,7 @@ import { SearchFilterPipe } from './_services/searchfilter.pipe';
 import { BackendService, DataItemService } from './_services';
 import { AnimationsService } from './_animations';
 import { KinveyModule } from 'kinvey-angular-sdk';
-import { CommodityValidationComponent, ActionRenderer } from './commodity-validation/commodity-validation.component';
+import { CommodityValidationComponent, ActionRenderer, DeleteRenderer } from './commodity-validation/commodity-validation.component';
 
 
 @NgModule({
@@ -26,14 +26,15 @@ import { CommodityValidationComponent, ActionRenderer } from './commodity-valida
     CommodityDetailsComponent,
     SearchFilterPipe,
     CommodityValidationComponent,
-    ActionRenderer
+    ActionRenderer,
+    DeleteRenderer
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     SharedModule,
     AppRoutingModule,
-     AgGridModule.withComponents([ActionRenderer]),
+     AgGridModule.withComponents([ActionRenderer, DeleteRenderer]),
      KinveyModule.init({
       appKey: 'kid_SyUyLQwwN',
       appSecret: '3cc1c58efbb0401c9bbfd612ffc55407'
