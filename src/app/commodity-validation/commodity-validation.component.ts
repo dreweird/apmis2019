@@ -6,7 +6,7 @@ import {FormBuilder, FormControl, FormGroup, Validators, FormGroupDirective} fro
 import "ag-grid-enterprise";
 import { MatSnackBar } from '@angular/material';
 import {ICellRendererAngularComp} from "ag-grid-angular";
-import * as moment from 'moment';
+
 
 @Component({
   selector: 'app-commodity-validation',
@@ -21,6 +21,9 @@ export class CommodityValidationComponent implements OnInit {
   myBackgroundImageUrl: string;
   rowData: [];
   rowData2: [];
+  autoGroupColumnDef: any;
+  components: any;
+  
 
   gridApi: any;
   gridApi2: any;
@@ -41,7 +44,8 @@ export class CommodityValidationComponent implements OnInit {
     {value: "10", viewValue: "October"},
     {value: "11", viewValue: "November"},
     {value: "12", viewValue: "December"}
-  ]
+  ];
+  
 
   area = [
     {area: 'Butuan City', prov: 'Agusan del Norte'},
@@ -50,7 +54,7 @@ export class CommodityValidationComponent implements OnInit {
     {area: 'San Jose', prov: 'Dinagat Island'},
     {area: 'Surigao City', prov: 'Surigao del Norte'},
     {area: 'Tandag City', prov: 'Surigao del Sur'}
-  ]
+  ];
   newFilter: { area: string; prov: string; }[];
   selectedArea: any;
 
@@ -64,19 +68,87 @@ onExport(){
 
 
 onGridReady(params) {
+  console.log(params.api);
   this.gridApi = params.api;
+  
 }
+
+groupRowAggNodes(nodes: any) {
+  const result = {
+    price: 0,
+    comp_high: 0,
+    comp_low: 0,
+  };
+  
+  nodes.forEach(function(node: any) {
+    //console.log(node);
+    if(!node.group){
+      var price=0;
+      var arr1 = [];
+      var children = node.parent.childrenAfterGroup;
+      //console.log(node.key);
+      children.forEach(function(child: any){
+        //console.log(child);
+        arr1.push(child.data.price);
+      });
+      var mf = 0;
+      var m = 0;
+      var item;
+      for (var i=0; i<arr1.length; i++){
+        for (var j=i; j<arr1.length; j++){
+          if (arr1[i] == arr1[j]) m++;
+          if (mf<m){
+            mf=m; 
+            item = arr1[i];
+          }
+        }
+        m=0;
+        }
+      result.price= item;
+      result.comp_high= Math.max.apply(null,arr1);
+      result.comp_low= Math.min.apply(null,arr1);
+    }
+  });
+  if(nodes.length>0&&nodes[0].parent.field=="month"){
+    return result;
+  }
+  
+}
+
 onGridReady2(params) {
   this.gridApi2 = params.api;
+  console.log(this.gridApi2);
 }
 reset(formDirective: FormGroupDirective){
   formDirective.resetForm();
   this.inputForm.reset();
 
 }
+
+onRemoveSelected(cell,rowIndex) {
+  console.log(this.gridApi2);
+  var selectedData = this.gridApi2.getSelectedRows();
+  console.log(this.gridApi2.getSelectedRows());
+  if(selectedData[0]==undefined){
+    alert("Please highlight the line you want to remove.");
+  }else{
+    var id = selectedData[0].id;
+    console.log(selectedData);
+    if(confirm("Are you sure you want to delete " + cell + "!")){
+    this.dataItemService.deleteData(id).subscribe(()=>{
+      var res = this.gridApi2.updateRowData({ remove: selectedData});
+      console.log(res);
+    });
+    }else{
+      console.log("false");
+    }
+  }
+}
+
 onSave(formDirective: FormGroupDirective){
 
   this.inputForm.value.date_surveyed = "2019-"+this.inputForm.value.date_surveyed+"-01";
+  this.inputForm.value.comm_id = this.id;
   this.dataItemService.saveData(this.inputForm.value).subscribe(()=>{
     if(!this.inputForm.value.id){
       console.log("add");
@@ -124,11 +196,19 @@ filterArea(event){
 }
 
   columnDefs = [
-    {headerName: 'Area', field: 'area' },
+    {headerName: 'Area', field: 'area', rowGroup: true, hide: true},
     {headerName: 'Date Surveyed', field: 'date_surveyed', width: 90 },
+    {headerName: 'Year', field: 'year', width: 90, valueGetter: 'new Date(data.date_surveyed).getFullYear()', rowGroup: true, hide: true},
+    //{headerName: 'Month', field: 'month', width: 90, valueGetter: 'new Date(data.date_surveyed).getMonth() + 1', hide: true},
+    {headerName: 'Month',field: 'month', width: 90, valueGetter: function(params){
+      var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      if(params.data!=undefined) return months[new Date(params.data.date_surveyed).getMonth()];
+    }, rowGroup: true, hide: true},
     {headerName: 'Price', field: 'price', width: 90},
-    {headerName: 'High', field: 'high', width: 90},
-    {headerName: 'Low', field: 'low', width: 90},
+    {headerName: 'High', field: 'comp_high', width: 90},
+    {headerName: 'Low', field: 'comp_low', width: 90},
+    {headerName: 'High', field: 'high', width: 90, hide: true},
+    {headerName: 'Low', field: 'low', width: 90, hide: true},
     {headerName: 'Respondent', field: 'respondent' },
     {headerName: 'Supplier', field: 'supplier' },
     {headerName: 'Remarks', field: 'remarks' },
@@ -141,8 +221,8 @@ columnDefs2 = [
   {headerName: 'Area', field: 'area', rowGroup: true, hide: true},
   {headerName: 'Date', field: 'date_surveyed',  width: 90  },
   {headerName: 'Price', field: 'price', width: 90},
-  {headerName: 'High', field: 'high', width: 90},
-  {headerName: 'Low', field: 'low', width: 90},
+  {headerName: 'High', field: 'high', width: 90,},
+  {headerName: 'Low', field: 'low', width: 90,},
   {headerName: 'Action', cellRenderer: 'actionRenderer', field: 'action'}
 ];
 frameworkComponents = {actionRenderer: ActionRenderer} ;
@@ -199,22 +279,7 @@ context = { componentParent: this };
 
   }
 
-  onRemoveSelected(cell) {
-    var selectedData = this.gridApi2.getSelectedRows();
-    var id = selectedData[0].id;
-    console.log(selectedData);
-    this.gridApi2.updateRowData({ remove: selectedData});
-    if(confirm("Are you sure you want to delete " + cell + "!")){
-     this.dataItemService.deleteData(id).subscribe(()=>{
-      var res = this.gridApi2.updateRowData({ remove: selectedData});
-      console.log(res);
-     })
-   
-  
-    }else{
-      console.log("false");
-    }
-  }
+ 
 
   onRemoveSelectedKinvey(id){
     var selectedData = this.gridApi.getRowNode(id);
@@ -255,19 +320,30 @@ context = { componentParent: this };
 
 }
 
+function getSimpleCellRenderer() {
+  function SimpleCellRenderer() {}
+  SimpleCellRenderer.prototype.init = function(params) {
+    const tempDiv = document.createElement('div');
+     console.log(params.node);
+      // console.log(params);
+      tempDiv.innerHTML = '<span>' + params.value + '</span>';
+     this.eGui = tempDiv.firstChild;
+  };
+  SimpleCellRenderer.prototype.getGui = function() {
+    return this.eGui;
+  };
+  return SimpleCellRenderer;
+}
+
 @Component({
   selector: 'child-cell',
   template: `
-  <button color="accent" *ngIf="!params.node.group" mat-button style="height: 20px"
+  <button color="accent" *ngIf="!params.node.group" mat-button 
   (click)="invokeParentMethod()" ><fa-icon icon="edit"></fa-icon></button>
 
-  <button color="warn" *ngIf="!params.node.group" mat-button style="height: 20px"
+  <button color="warn" *ngIf="!params.node.group" mat-button 
   (click)="invokeParentMethod2()" ><fa-icon icon="trash"></fa-icon></button>`,
-  styles: [
-      `.btn {
-          line-height: 0.5
-      }`
-  ]
+  
 })
 export class ActionRenderer implements ICellRendererAngularComp {
   public params: any;
@@ -281,8 +357,8 @@ export class ActionRenderer implements ICellRendererAngularComp {
   }
 
   public invokeParentMethod2() {
-   // console.log(this.params);
-      this.params.context.componentParent.onRemoveSelected(`Name: ${this.params.data.commodity}, Row: ${this.params.node.rowIndex}`)
+    console.log(this.params);
+      this.params.context.componentParent.onRemoveSelected(`Row: ${this.params.rowIndex+1}\nData: Date = ${new Date(this.params.data.date_surveyed)} Price = ${this.params.data.price} High = ${this.params.data.high} Low = ${this.params.data.low}`,this.params.rowIndex)
   }
 
   refresh(): boolean {
