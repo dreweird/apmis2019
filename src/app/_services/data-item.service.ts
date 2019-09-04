@@ -31,12 +31,15 @@ export class DataItemService {
     }
 
     saveData(item: any){
-        const url = `http://localhost/apmis/api/data/read.php?get=saveData`;
+        console.log(item);
+        const url = `${this.apiRoot}/saveData`;
+        //const url = `http://localhost/apmis/api/data/read.php?get=saveData`;
         return this.http.post<any>(url, {item});
     }
 
     deleteData(id: number){
-        const url = `http://localhost/apmis/api/data/read.php?get=deleteData`;
+        const url = `${this.apiRoot}/deleteData`;
+       //const url = `http://localhost/apmis/api/data/read.php?get=deleteData`;
         return this.http.post<any>(url, {id});
     }
 
