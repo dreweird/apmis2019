@@ -3,7 +3,6 @@ import { Injectable } from "@angular/core";
 import { UserService, DataStoreService, Query  } from  'kinvey-angular-sdk';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-
 const _CURRENT_USER = "_CURRENT_USER";
 
 export class User {
@@ -56,6 +55,10 @@ export class BackendService {
       query.equalTo('name', commodity_name);
       query.ascending("_kmd.ect");
       return this.collection.find(query);
+    }
+
+    deleteData(entity_id){
+      return this.collection.removeById(entity_id);
     }
 
 

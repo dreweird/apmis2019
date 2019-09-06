@@ -6,7 +6,7 @@ import {FormBuilder, FormControl, FormGroup, Validators, FormGroupDirective} fro
 import "ag-grid-enterprise";
 import { MatSnackBar } from '@angular/material';
 import {ICellRendererAngularComp} from "ag-grid-angular";
-import * as moment from 'moment';
+
 
 @Component({
   selector: 'app-commodity-validation',
@@ -29,6 +29,7 @@ export class CommodityValidationComponent implements OnInit {
   gridApi: any;
   gridApi2: any;
   getRowNodeId: any;
+  getRowNodeIdKinvey: any;
   inputForm: FormGroup;
   rowSelection = "single";
   month = [
@@ -274,14 +275,18 @@ filterArea(event){
       var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
       if(params.data!=undefined) return months[new Date(params.data.date_surveyed).getMonth()];
     }, rowGroup: true, hide: true},
-    {headerName: 'Price', cellClass:['data'], field: 'price', width: 90},
-    {headerName: 'High', cellClass:['data'], field: 'comp_high', width: 90},
-    {headerName: 'Low', cellClass:['data'], field: 'comp_low', width: 90},
-    {headerName: 'High', cellClass:['data'], field: 'high', width: 90, hide: true},
-    {headerName: 'Low', cellClass:['data'], field: 'low', width: 90, hide: true},
-    {headerName: 'Respondent', cellClass:['data'], field: 'respondent' },
-    {headerName: 'Supplier', cellClass:['data'], field: 'supplier' },
-    {headerName: 'Remarks', cellClass:['data'], field: 'remarks' }
+
+    {headerName: 'Price', field: 'price', width: 90},
+    {headerName: 'High', field: 'comp_high', width: 90},
+    {headerName: 'Low', field: 'comp_low', width: 90},
+    {headerName: 'High', field: 'high', width: 90, hide: true},
+    {headerName: 'Low', field: 'low', width: 90, hide: true},
+    {headerName: 'Respondent', field: 'respondent' },
+    {headerName: 'Supplier', field: 'supplier' },
+    {headerName: 'Remarks', field: 'remarks' },
+    {delete: 'Remarks', field: 'remarks' },
+    {headerName: 'Action', cellRenderer: 'deleteRenderer', field: 'action'}
+
 ];
 
 columnDefs2 = [
@@ -322,6 +327,7 @@ columnDefs2 = [
   {headerName: 'Action', cellClass:['data'], cellRenderer: 'actionRenderer', field: 'action'}
 ];
 frameworkComponents = {actionRenderer: ActionRenderer} ;
+frameworkComponents2 =  {deleteRenderer: DeleteRenderer} //kinvey delete
 context = { componentParent: this };
 
 
@@ -376,15 +382,8 @@ context = { componentParent: this };
             unit: new FormControl('kilo'),
             id: new FormControl(null)
           }); 
-
-          console.log(this.inputForm);
           this.kinveyStore.getData(this.commodity.name).subscribe(res=>{
-    
-            // for(let i=0; i<res.length; i++){
-            //    let yearWeek = moment(res[i].date_surveyed).year()+'-'+moment(res[i].date_surveyed).week();
-            //  //  console.log(yearWeek);
-            //    res[i].yearWeek = yearWeek
-            //  }
+
              this.rowData = res;
              console.log(this.rowData);
            })
@@ -397,14 +396,42 @@ context = { componentParent: this };
  
 
     this.getRowNodeId = function(data) {
+     // console.log(data);
       return data.id;
     };
+
+
+    this.getRowNodeIdKinvey = function(data) {
+      return data._id;
+    };
+
     }
 
   ngOnInit() {
 
   }
 
+ 
+
+  onRemoveSelectedKinvey(id){
+    var selectedData = this.gridApi.getRowNode(id);
+    console.log(selectedData);
+
+
+    if(confirm("Are you sure you want to delete the data?") ){
+      selectedData.data.id = id;
+      this.gridApi.updateRowData({ remove: [selectedData.data]});
+      this.kinveyStore.deleteData(id).then((result: {}) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });;
+    }
+   
+
+
+  }
 
   editData(cell){
     console.log(cell);
@@ -451,6 +478,35 @@ export class ActionRenderer implements ICellRendererAngularComp {
   public invokeParentMethod2() {
     console.log(this.params);
       this.params.context.componentParent.onRemoveSelected(`Row: ${this.params.rowIndex+1}\nData: Date = ${new Date(this.params.data.date_surveyed)} Price = ${this.params.data.price} High = ${this.params.data.high} Low = ${this.params.data.low}`,this.params.rowIndex)
+  }
+
+  refresh(): boolean {
+      return false;
+  }
+}
+
+@Component({
+  template: `
+  <button color="warn" *ngIf="!params.node.group" mat-button style="height: 30px"
+  (click)="invokeDeleteParent()" ><fa-icon icon="trash"></fa-icon></button>`,
+  styles: [
+      `.btn {
+          line-height: 0.5
+      }`
+  ]
+})
+export class DeleteRenderer implements ICellRendererAngularComp {
+  public params: any;
+
+  agInit(params: any): void {
+      this.params = params;
+  }
+
+
+
+  public invokeDeleteParent() {
+     console.log(this.params.data._id);
+      this.params.context.componentParent.onRemoveSelectedKinvey(this.params.data._id);
   }
 
   refresh(): boolean {
