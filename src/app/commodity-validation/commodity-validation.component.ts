@@ -22,6 +22,7 @@ export class CommodityValidationComponent implements OnInit {
   rowData: [];
   rowData2: [];
   autoGroupColumnDef: any;
+  excelStyles:any;
   components: any;
   
 
@@ -45,6 +46,7 @@ export class CommodityValidationComponent implements OnInit {
     {value: "11", viewValue: "November"},
     {value: "12", viewValue: "December"}
   ];
+  months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   
 
   area = [
@@ -60,8 +62,51 @@ export class CommodityValidationComponent implements OnInit {
 
 onExport(){
   this.gridApi.exportDataAsExcel({
+    customHeader  : [
+      [{styleId:'headappend',data:{type:'String', value:'DEPARTMENT OF AGRICULTURE'}}],
+      [{styleId:'headappend',data:{type:'String', value:'Regional Field Office XIII'}}],
+      [{styleId:'headappend',data:{type:'String', value:'Agri-business and Marketing Assistance Division'}}],
+      [{styleId:'headappend',data:{type:'String', value:'Raw Data Collection (Weekly Basis)'}}],
+      [{styleId:'headappend',data:{type:'String', value: 'APMIS v1.0 Generated as of '+this.months[new Date().getMonth()]+' '+new Date().getDate()+', '+new Date().getFullYear()
+      }}],
+      [],
+    ],
     sheetName: this.commodity.name + '- Raw Data Collection (Weekly Basis)',
-    fileName: this.commodity.name + '- Raw Data Collection (Weekly Basis)'
+    fileName: this.commodity.name + '- Raw Data Collection (Weekly Basis)',
+    columnKeys:['area','date_surveyed','price','comp_high','comp_low','respondent','supplier','remarks'],
+    processCellCallback:function (params){
+      var node = params.node;
+      console.log(params);
+      if(node.group){
+          if(params.column.colId=="area") return node.key;
+          else return params.value;
+      }else if(params.column.colId!="area") return params.value;
+    },
+  })
+}
+
+onExport2(){
+  this.gridApi2.exportDataAsExcel({
+    customHeader  : [
+      [{styleId:'headappend',data:{type:'String', value:'DEPARTMENT OF AGRICULTURE'}}],
+      [{styleId:'headappend',data:{type:'String', value:'Regional Field Office XIII'}}],
+      [{styleId:'headappend',data:{type:'String', value:'Agri-business and Marketing Assistance Division'}}],
+      [{styleId:'headappend',data:{type:'String', value:'Verified Data Collection (Monthly Basis)'}}],
+      [{styleId:'headappend',data:{type:'String', value: 'APMIS v1.0 Generated as of '+this.months[new Date().getMonth()]+' '+new Date().getDate()+', '+new Date().getFullYear()
+      }}],
+      [],
+    ],
+    sheetName: this.commodity.name + '- Verified Data Collection (Monthly Basis)',
+    fileName: this.commodity.name + '- Verified Data Collection (Monthly Basis)',
+    columnKeys:['area','date_surveyed','price','high','low'],
+    processCellCallback:function (params){
+      var node = params.node;
+      console.log(params);
+      if(node.group){
+          if(params.column.colId=="area") return node.key;
+          else return params.value;
+      }else if(params.column.colId!="area") return params.value;
+    },
   })
 }
 
@@ -196,14 +241,41 @@ filterArea(event){
 }
 
   columnDefs = [
-    {headerName: 'Area', field: 'area', rowGroup: true, hide: true},
-    {headerName: 'Date Surveyed', field: 'date_surveyed', width: 90 },
-    {headerName: 'Year', field: 'year', width: 90, valueGetter: 'new Date(data.date_surveyed).getFullYear()', rowGroup: true, hide: true},
+    {headerName: 'Area', cellClass:['data','stringType'],
+    cellClassRules:{
+      indent1: function(params){
+        if(params.node.uiLevel==1) return true;
+      },
+      indent2: function(params){
+        if(params.node.uiLevel==2) return true;
+      },
+      indent3: function(params){
+        if(params.node.uiLevel==3) return true;
+      },
+      indent4: function(params){
+        if(params.node.uiLevel==4) return true;
+      },
+      indent5: function(params){
+        if(params.node.uiLevel==5) return true;
+      },
+      bold: function(params){
+        if(params.node.group) return true;
+      }
+    }, field: 'area', rowGroup: true, hide: true},
+    {headerName: 'Date Surveyed', cellClass:['data'], field: 'date_surveyed',  width: 180, valueGetter:function(params){
+      if(params.data!=undefined){
+        var data = params.data;
+        var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        return months[new Date(data.date_surveyed).getMonth()]+" "+new Date(data.date_surveyed).getDate()+", "+new Date(data.date_surveyed).getFullYear();
+      }
+    } },
+    {headerName: 'Year', cellClass:['data'], field: 'year', width: 90, valueGetter: 'new Date(data.date_surveyed).getFullYear()', rowGroup: true, hide: true},
     //{headerName: 'Month', field: 'month', width: 90, valueGetter: 'new Date(data.date_surveyed).getMonth() + 1', hide: true},
-    {headerName: 'Month',field: 'month', width: 90, valueGetter: function(params){
+    {headerName: 'Month', cellClass:['data'],field: 'month', width: 90, valueGetter: function(params){
       var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
       if(params.data!=undefined) return months[new Date(params.data.date_surveyed).getMonth()];
     }, rowGroup: true, hide: true},
+
     {headerName: 'Price', field: 'price', width: 90},
     {headerName: 'High', field: 'comp_high', width: 90},
     {headerName: 'Low', field: 'comp_low', width: 90},
@@ -214,16 +286,45 @@ filterArea(event){
     {headerName: 'Remarks', field: 'remarks' },
     {delete: 'Remarks', field: 'remarks' },
     {headerName: 'Action', cellRenderer: 'deleteRenderer', field: 'action'}
+
 ];
 
 columnDefs2 = [
-  {headerName: 'Province', field: 'prov', rowGroup: true, hide: true },
-  {headerName: 'Area', field: 'area', rowGroup: true, hide: true},
-  {headerName: 'Date', field: 'date_surveyed',  width: 90  },
-  {headerName: 'Price', field: 'price', width: 90},
-  {headerName: 'High', field: 'high', width: 90,},
-  {headerName: 'Low', field: 'low', width: 90,},
-  {headerName: 'Action', cellRenderer: 'actionRenderer', field: 'action'}
+  {headerName: 'Province',cellClass:['data'], field: 'prov', rowGroup: true, hide: true,},
+  {headerName: 'Area', field: 'area', rowGroup: true, hide: true,
+  cellClass:['data','stringType'],
+  cellClassRules:{
+    indent1: function(params){
+      if(params.node.uiLevel==1) return true;
+    },
+    indent2: function(params){
+      if(params.node.uiLevel==2) return true;
+    },
+    indent3: function(params){
+      if(params.node.uiLevel==3) return true;
+    },
+    indent4: function(params){
+      if(params.node.uiLevel==4) return true;
+    },
+    indent5: function(params){
+      if(params.node.uiLevel==5) return true;
+    },
+    bold: function(params){
+      if(params.node.group) return true;
+    }
+  },},
+  {headerName: 'Date', cellClass:['data'], field: 'date_surveyed',  width: 90, hide: true},
+  {headerName: 'Date', cellClass:['data'], field: 'date_view',  width: 180, valueGetter:function(params){
+    if(params.data!=undefined){
+      var data = params.data;
+      var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      return months[new Date(data.date_surveyed).getMonth()]+", "+new Date(data.date_surveyed).getFullYear();
+    }
+  }},
+  {headerName: 'Price', cellClass:['data'], field: 'price', width: 90},
+  {headerName: 'High', cellClass:['data'], field: 'high', width: 90,},
+  {headerName: 'Low', cellClass:['data'], field: 'low', width: 90,},
+  {headerName: 'Action', cellClass:['data'], cellRenderer: 'actionRenderer', field: 'action'}
 ];
 frameworkComponents = {actionRenderer: ActionRenderer} ;
 frameworkComponents2 =  {deleteRenderer: DeleteRenderer} //kinvey delete
@@ -232,6 +333,37 @@ context = { componentParent: this };
 
   constructor(private route: ActivatedRoute, private dataItemService: DataItemService,
     private kinveyStore: BackendService, private snackBar: MatSnackBar) { 
+      this.excelStyles= [
+        { id:"stringType",dataType :'string' },
+        { id:"indent1",alignment :{indent:1} },
+        { id:"indent2",alignment :{indent:3} },
+        { id:"indent3",alignment :{indent:5} },
+        { id:"indent4",alignment :{indent:7} },
+        { id:"indent5",alignment :{indent:9} },
+        { id:"bold", font: {bold:true} },
+        {
+          id: "data",
+          font: { size:11, fontName: "Calibri", },
+          borders: {
+            borderBottom: { color: "#000000", lineStyle: "Continuous", weight: 1 },
+            borderLeft: { color: "#000000", lineStyle: "Continuous", weight: 1 },
+            borderRight: { color: "#000000", lineStyle: "Continuous", weight: 1 },
+            borderTop: { color: "#000000", lineStyle: "Continuous", weight: 1 },
+          }
+        },
+        {
+          id: "header",
+          font: { size:11, fontName: "Calibri", bold: true, },
+          borders: {
+            borderBottom: { color: "#000000", lineStyle: "Continuous", weight: 1 },
+            borderLeft: { color: "#000000", lineStyle: "Continuous", weight: 1 },
+            borderRight: { color: "#000000", lineStyle: "Continuous", weight: 1 },
+            borderTop: { color: "#000000", lineStyle: "Continuous", weight: 1 },
+          }
+        },
+        { id: "headappend", font: { size:11, fontName: "Calibri", bold: true, }, }
+      ];
+
       this.route.params.subscribe(params => {
         this.id = +params['id']; // (+) converts string 'id' to a number
         this.dataItemService.getSelected(this.id).subscribe(data=>{
@@ -268,11 +400,11 @@ context = { componentParent: this };
       return data.id;
     };
 
+
     this.getRowNodeIdKinvey = function(data) {
       return data._id;
     };
 
-     
     }
 
   ngOnInit() {
@@ -320,20 +452,7 @@ context = { componentParent: this };
 
 }
 
-function getSimpleCellRenderer() {
-  function SimpleCellRenderer() {}
-  SimpleCellRenderer.prototype.init = function(params) {
-    const tempDiv = document.createElement('div');
-     console.log(params.node);
-      // console.log(params);
-      tempDiv.innerHTML = '<span>' + params.value + '</span>';
-     this.eGui = tempDiv.firstChild;
-  };
-  SimpleCellRenderer.prototype.getGui = function() {
-    return this.eGui;
-  };
-  return SimpleCellRenderer;
-}
+
 
 @Component({
   selector: 'child-cell',

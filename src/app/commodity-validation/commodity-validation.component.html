@@ -16,10 +16,12 @@
     class="ag-theme-balham"
     [rowData]="rowData" 
     [columnDefs]="columnDefs"
+    [excelStyles]="excelStyles"
     [context]="context"
     [rowSelection]="rowSelection"
     [getRowNodeId]="getRowNodeIdKinvey"
     [frameworkComponents]="frameworkComponents2"
+
     [groupRowAggNodes]="groupRowAggNodes"
     [groupRemoveSingleChildren]="false"
     [groupDefaultExpanded]=2
@@ -99,11 +101,14 @@
             <div class="col-md-12 wrapper">
     <mat-card [ngClass]="routeAnimationsElements">
         <h2>Verified Data Collection (Monthly Basis)</h2>
+        <button mat-raised-button color="primary" (click)="onExport2()" >Export to Excel</button>
         <ag-grid-angular 
         style="width: 100%; height: 500px;" 
         class="ag-theme-balham"
         [rowData]="rowData2" 
         [columnDefs]="columnDefs2"
+        [excelStyles]="excelStyles"
+        [groupDefaultExpanded]=-1
         [context]="context"
         [rowSelection]="rowSelection"
         [getRowNodeId]="getRowNodeId"
