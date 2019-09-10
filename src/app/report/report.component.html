@@ -1,0 +1,63 @@
+<div class="container">
+  <div class="row justify-content-between" [ngClass]="routeAnimationsElements">
+    <div class="col-md-12">
+      <h1 class="main-heading">APMIS Reports</h1>
+    </div>
+    <div class="col-md-12">
+      <form [formGroup]="inputForm" #formDirective="ngForm">
+        <table class="example-full-width" cellspacing="0">
+          <tr>
+
+            <td>
+              <mat-form-field>
+                <mat-label>Select Year</mat-label>
+                <mat-select formControlName="year">
+                  <mat-option *ngFor="let y of year" [value]="y.value">{{y.viewValue}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+            <td>
+
+              <mat-form-field>
+                <mat-label>Select Month</mat-label>
+                <mat-select formControlName="month">
+                  <mat-option *ngFor="let m of month" [value]="m">{{m.viewValue}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+            <td>
+              <button [disabled]="!inputForm.valid" mat-raised-button color="primary"
+                (click)="onGenerate(formDirective)">Generate Report</button>
+            </td>
+          </tr>
+        </table>
+      </form>
+
+
+
+    </div>
+    <div class="col-md-12">
+      <div class="center">
+        <h2>Monthly Price Monitoring Report</h2>
+        <h3>Agribusiness and Marketing Assistance Division</h3>
+      </div>
+      <div>
+        <pre> <strong>Market:</strong> Selected Wet Markets in Caraga</pre>
+        <pre> <strong>Date:</strong> {{m}}   {{y}} </pre>
+        <pre> <strong>Prevailing Price of Selected Agricultural Commodities</strong> </pre>
+        <button class="left" mat-raised-button color="primary" (click)="onExport()">Export to Excel</button>
+      </div>
+      <div>
+        <ag-grid-angular style="width: 100%; height: 500px;" class="ag-theme-balham" [rowData]="rowData"
+          [columnDefs]="columnDefs" [autoGroupColumnDef]="autoGroupColumnDef" [components]="components"
+          [groupRemoveSingleChildren]="false" [groupDefaultExpanded]=2>
+        </ag-grid-angular>
+      </div>
+
+    </div>
+  </div>
+  <br><br>
+
+
+
+</div>

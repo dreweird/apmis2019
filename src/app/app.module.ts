@@ -15,6 +15,7 @@ import { BackendService, DataItemService } from './_services';
 import { AnimationsService } from './_animations';
 import { KinveyModule } from 'kinvey-angular-sdk';
 import { CommodityValidationComponent, ActionRenderer, DeleteRenderer } from './commodity-validation/commodity-validation.component';
+import { ReportComponent } from './report/report.component';
 
 
 @NgModule({
@@ -27,7 +28,8 @@ import { CommodityValidationComponent, ActionRenderer, DeleteRenderer } from './
     SearchFilterPipe,
     CommodityValidationComponent,
     ActionRenderer,
-    DeleteRenderer
+    DeleteRenderer,
+    ReportComponent
   ],
   imports: [
     BrowserModule,

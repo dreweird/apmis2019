@@ -29,7 +29,18 @@ export class CommodityComponent implements OnInit {
     private logService: BackendService) { }
 
   ngOnInit() {
-    this.dataItemService.getAllCommodity().subscribe(data=>{
+    this.dataItemService.getAllCommodity().subscribe((data: any)=>{
+
+     // console.log(this.commodities);
+      // var groups = data.reduce(function(obj, item){
+      //   obj[item.category] = obj[item.category] || [];
+      //   obj[item.category].push({"name": item.name, "imageSrc": item.imageSrc, "category": item.category});
+      //   return obj;
+      // }, {});
+      // var myArray = Object.keys(groups).map(function(key){
+      //   return {category: key, items: groups[key]};
+      // });
+
       this.commodities = data;
       console.log(this.commodities);
     })
