@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit {
     },
     {
       title: 'Reports',
-      route: 'reports'
+      route: 'report'
     }         
   ];
 

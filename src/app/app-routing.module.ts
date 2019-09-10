@@ -6,6 +6,7 @@ import { LoginComponent } from './login/login.component';
 import { CommodityComponent } from './commodity/commodity.component';
 import { CommodityDetailsComponent } from './commodity-details/commodity-details.component';
 import { CommodityValidationComponent } from './commodity-validation/commodity-validation.component';
+import { ReportComponent } from './report/report.component';
 
 
 const routes: Routes = [
@@ -33,6 +34,7 @@ const routes: Routes = [
             },
 
             { path: 'login', component: LoginComponent },
+            { path: 'report', component: ReportComponent },
            
         ]
     },

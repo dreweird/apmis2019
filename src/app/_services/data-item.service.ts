@@ -12,8 +12,8 @@ export class DataItemService {
     constructor(private http: HttpClient) {}
 
     private _selectedId = -1;
-    apiRoot: string = "http://210.5.100.46:4000";
-   // apiRoot: string = "http://172.16.130.10:4000";
+    //apiRoot: string = "http://210.5.100.46:4000";
+    apiRoot: string = "http://172.16.130.10:4000";
     allCommodity: any;
 
     getItem(id: number){
@@ -25,6 +25,12 @@ export class DataItemService {
         const url = `${this.apiRoot}/getSelected`;
         return this.http.post<any>(url, {id});
     }
+
+    monthlyReports(month, year) {
+        const url = `${this.apiRoot}/monthlyReports`;
+        return this.http.post<any>(url, {month, year});
+    }
+
 
     get3MosAgo(id: number, area: string){
         const url = `${this.apiRoot}/get3MosAgo`;
