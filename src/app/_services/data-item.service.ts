@@ -12,8 +12,9 @@ export class DataItemService {
     constructor(private http: HttpClient) {}
 
     private _selectedId = -1;
-    //apiRoot: string = "http://210.5.100.46:4000";
-    apiRoot: string = "http://172.16.130.10:4000";
+    apiRoot: string = "http://210.5.100.46:4000";
+    //apiRoot: string = "http://172.16.130.10:4000";
+    //apiRoot: string = "http://localhost:4000";
     allCommodity: any;
 
     getItem(id: number){

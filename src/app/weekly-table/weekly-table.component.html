@@ -1,0 +1,22 @@
+<mat-card>
+    <h2>Raw Data Collection (Weekly Basis)</h2>
+    <button mat-raised-button color="primary" (click)="onExport()" >Export to Excel</button>
+    <ag-grid-angular 
+    style="width: 100%; height: 500px;" 
+    class="ag-theme-balham"
+    [rowData]="rowData" 
+    [columnDefs]="columnDefs"
+    [excelStyles]="excelStyles"
+    [context]="context"
+    [rowSelection]="rowSelection"
+    [getRowNodeId]="getRowNodeIdKinvey"
+    [frameworkComponents]="frameworkComponents2"
+
+    [groupRowAggNodes]="groupRowAggNodes"
+    [groupRemoveSingleChildren]="false"
+    [groupDefaultExpanded]=2
+    (gridReady)="onGridReady($event)"
+    >
+  </ag-grid-angular>
+
+</mat-card>

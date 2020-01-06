@@ -30,6 +30,9 @@ export class CommodityDetailsComponent implements OnInit, OnDestroy {
   monthAgo = new Array();
   month3Ago = new Array();
   yearAgo = new Array();
+  monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
 
   foods: Food[] = [
     {value: 'Butuan City', viewValue: 'Agusan del Norte - Butuan City'},
@@ -47,7 +50,9 @@ export class CommodityDetailsComponent implements OnInit, OnDestroy {
     {headerName: 'Province', field: 'prov', rowGroup: true, hide: true },
     {headerName: 'Area', field: 'area', rowGroup: true },
     {headerName: 'Year', field: 'year', rowGroup: true, hide: true },
-    {headerName: 'Date', field: 'date_surveyed' },
+    {headerName: 'Date', field: 'date_surveyed', valueFormatter : (params) => {
+       return params.value ? (this.monthNames[new Date(params.value).getMonth()] ) : '';
+  } },
     {headerName: 'Price', field: 'price'},
     {headerName: 'High', field: 'high'},
     {headerName: 'Low', field: 'low'}
@@ -69,7 +74,10 @@ onGridReady(params) {
   this.gridApi = params.api;
 }
 
-  constructor(private route: ActivatedRoute, private dataItemService: DataItemService) { }
+  constructor(private route: ActivatedRoute, private dataItemService: DataItemService) {
+
+
+   }
 
     ngDoCheck(){
 			/* Check https://angular.io/guide/lifecycle-hooks#docheck for informaton about ngDoCheck */

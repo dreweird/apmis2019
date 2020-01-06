@@ -26,7 +26,7 @@ export class CommodityComponent implements OnInit {
   //   mergeMap(group => group.pipe(toArray()))
   // );
   constructor(private router: Router, private dataItemService: DataItemService,
-    private logService: BackendService) { }
+    public logService: BackendService) { }
 
   ngOnInit() {
     this.dataItemService.getAllCommodity().subscribe((data: any)=>{

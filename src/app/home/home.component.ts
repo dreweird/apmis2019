@@ -16,8 +16,8 @@ import { BackendService } from '../_services';
 export class HomeComponent implements OnInit {
 
   isProd = env.production;
-  envName = env.envName;
-  version = env.versions.app;
+  envName = '';
+  version = 1.0;
   isAuthenticated$ = new BehaviorSubject<boolean>(false);
   
 
@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit {
   ];
 
   constructor(private router: Router, private animationService: AnimationsService,
-    private logService: BackendService) {
+    public logService: BackendService) {
     this.animationService.updateRouteAnimationType(true, true);
 
    }

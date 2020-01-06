@@ -16,6 +16,8 @@ import { AnimationsService } from './_animations';
 import { KinveyModule } from 'kinvey-angular-sdk';
 import { CommodityValidationComponent, ActionRenderer, DeleteRenderer } from './commodity-validation/commodity-validation.component';
 import { ReportComponent } from './report/report.component';
+import { WeeklyFormsComponent } from './weekly-forms/weekly-forms.component';
+import { WeeklyTableComponent } from './weekly-table/weekly-table.component';
 
 
 @NgModule({
@@ -29,7 +31,9 @@ import { ReportComponent } from './report/report.component';
     CommodityValidationComponent,
     ActionRenderer,
     DeleteRenderer,
-    ReportComponent
+    ReportComponent,
+    WeeklyFormsComponent,
+    WeeklyTableComponent
   ],
   imports: [
     BrowserModule,

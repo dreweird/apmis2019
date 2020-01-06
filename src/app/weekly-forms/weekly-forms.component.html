@@ -1,0 +1,66 @@
+<mat-card *ngIf="inputWeeklyForm">
+    <h2> Data Inputting (Weekly Basis)</h2>
+    <form [formGroup]="inputWeeklyForm" #formDirective="ngForm"  >
+      <table class="example-full-width" cellspacing="0"><tr>
+          <td>
+              <mat-form-field >   
+                  <mat-label>Select Province</mat-label>
+                  <mat-select formControlName="prov" (selectionChange)="filterArea($event)">
+                    <mat-option value="Agusan del Norte">Agusan del Norte</mat-option>
+                    <mat-option value="Agusan del Sur">Agusan del Sur</mat-option>
+                    <mat-option value="Surigao del Norte">Surigao del Norte</mat-option>
+                    <mat-option value="Surigao del Sur">Surigao del Sur</mat-option>
+                    <mat-option value="Dinagat Island">Dinagat Island</mat-option>
+                  </mat-select>
+              </mat-form-field>  
+          </td>
+          <td>
+              <mat-form-field>   
+                  <mat-label>Select Area</mat-label>
+                  <mat-select formControlName="area" >
+                    <mat-option *ngFor="let a of newFilter"  [value]="a.area">{{a.area}}</mat-option>
+                  </mat-select>
+              </mat-form-field>   
+          </td>
+          <td>
+            <mat-form-field>
+                <input matInput type="date" formControlName="date_surveyed" placeholder="Date Surveyed">
+            </mat-form-field> 
+          </td>
+        </tr>
+        <tr>
+          <td>
+              <mat-form-field>
+                  <input matInput  formControlName="seller" placeholder="Name of Seller/Vendor">
+              </mat-form-field>    
+          </td>
+          <td>
+              <mat-form-field>
+                  <input matInput  formControlName="supplier" placeholder="Name of Supplier">
+              </mat-form-field>    
+          </td>
+          <td>
+              <mat-form-field>
+                  <input matInput type="number" formControlName="price" placeholder="Retail Price">
+              </mat-form-field>    
+          </td>
+        </tr>
+        <tr>
+            <td>
+                <mat-form-field>
+                    <input matInput  formControlName="remarks" placeholder="Remarks">
+                </mat-form-field>    
+            </td>
+          <td>
+            <button type="reset"
+            mat-raised-button >RESET</button>
+        </td>
+          <td>
+              <button [disabled]="!inputWeeklyForm.valid"  
+              mat-raised-button color="primary" (click)="onSave(formDirective)">SAVE</button>
+          </td>
+        </tr>
+  </table>      
+     
+</form>
+</mat-card>

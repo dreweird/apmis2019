@@ -5,7 +5,11 @@
         <h1 class="centered">{{commodity.category}} - {{commodity.name}}</h1>
         </div>
     </div>
-  
+    <div class="row" *ngIf="commodity">
+        <div class="col-md-12 wrapper">
+            <app-weekly-forms [commodity]="commodity"></app-weekly-forms>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-12 wrapper">
 <mat-card [ngClass]="routeAnimationsElements">
