@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ROUTE_ANIMATIONS_ELEMENTS } from '../_animations/index';
-import { commodity, Commodity } from './commodity.data';
+import { Commodity } from './commodity.data';
 import { DataItemService, BackendService } from '../_services'
 import { Router } from '@angular/router';
 ﻿import { from } from 'rxjs/observable/from';
@@ -26,7 +26,7 @@ export class CommodityComponent implements OnInit {
   //   mergeMap(group => group.pipe(toArray()))
   // );
   constructor(private router: Router, private dataItemService: DataItemService,
-    private logService: BackendService) { }
+    public logService: BackendService) { }
 
   ngOnInit() {
     this.dataItemService.getAllCommodity().subscribe((data: any)=>{
@@ -53,10 +53,10 @@ export class CommodityComponent implements OnInit {
   }
 
   onClick(commodity: Commodity){
-    this.router.navigate(['/home/commodity-details', commodity.id]);
+    this.router.navigate(['/home/commodity-details', commodity.commodity_id]);
   }
 
   onValidate(commodity: Commodity){
-    this.router.navigate(['/home/commodity-validation', commodity.id]);
+    this.router.navigate(['/home/commodity-validation', commodity.commodity_id]);
   }
 }

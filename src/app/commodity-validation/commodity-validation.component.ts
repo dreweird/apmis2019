@@ -21,7 +21,7 @@ export class CommodityValidationComponent implements OnInit {
   myBackgroundImageUrl: string;
   rowData: [];
   rowData2: [];
-  autoGroupColumnDef: any;
+
   excelStyles:any;
   components: any;
   
@@ -60,32 +60,8 @@ export class CommodityValidationComponent implements OnInit {
   newFilter: { area: string; prov: string; }[];
   selectedArea: any;
 
-onExport(){
-  this.gridApi.exportDataAsExcel({
-    customHeader  : [
-      [{styleId:'headappend',data:{type:'String', value:'DEPARTMENT OF AGRICULTURE'}}],
-      [{styleId:'headappend',data:{type:'String', value:'Regional Field Office XIII'}}],
-      [{styleId:'headappend',data:{type:'String', value:'Agri-business and Marketing Assistance Division'}}],
-      [{styleId:'headappend',data:{type:'String', value:'Raw Data Collection (Weekly Basis)'}}],
-      [{styleId:'headappend',data:{type:'String', value: 'APMIS v1.0 Generated as of '+this.months[new Date().getMonth()]+' '+new Date().getDate()+', '+new Date().getFullYear()
-      }}],
-      [],
-    ],
-    sheetName: this.commodity.name + '- Raw Data Collection (Weekly Basis)',
-    fileName: this.commodity.name + '- Raw Data Collection (Weekly Basis)',
-    columnKeys:['area','date_surveyed','price','comp_high','comp_low','respondent','supplier','remarks'],
-    processCellCallback:function (params){
-      var node = params.node;
-      console.log(params);
-      if(node.group){
-          if(params.column.colId=="area") return node.key;
-          else return params.value;
-      }else if(params.column.colId!="area") return params.value;
-    },
-  })
-}
 
-onExport2(){
+onExport(){
   this.gridApi2.exportDataAsExcel({
     customHeader  : [
       [{styleId:'headappend',data:{type:'String', value:'DEPARTMENT OF AGRICULTURE'}}],
@@ -111,94 +87,27 @@ onExport2(){
 }
 
 
-
-onGridReady(params) {
-  console.log(params.api);
-  this.gridApi = params.api;
-  
-}
-
-groupRowAggNodes(nodes: any) {
-  const result = {
-    price: 0,
-    comp_high: 0,
-    comp_low: 0,
-  };
-  
-  nodes.forEach(function(node: any) {
-    //console.log(node);
-    if(!node.group){
-      var price=0;
-      var arr1 = [];
-      var children = node.parent.childrenAfterGroup;
-      //console.log(node.key);
-      children.forEach(function(child: any){
-        //console.log(child);
-        arr1.push(child.data.price);
-      });
-      var mf = 0;
-      var m = 0;
-      var item;
-      for (var i=0; i<arr1.length; i++){
-        for (var j=i; j<arr1.length; j++){
-          if (arr1[i] == arr1[j]) m++;
-          if (mf<m){
-            mf=m; 
-            item = arr1[i];
-          }
-        }
-        m=0;
-        }
-      result.price= item;
-      result.comp_high= Math.max.apply(null,arr1);
-      result.comp_low= Math.min.apply(null,arr1);
-    }
-  });
-  if(nodes.length>0&&nodes[0].parent.field=="month"){
-    return result;
-  }
-  
-}
-
-onGridReady2(params) {
-  this.gridApi2 = params.api;
-  console.log(this.gridApi2);
-}
 reset(formDirective: FormGroupDirective){
   formDirective.resetForm();
   this.inputForm.reset();
 
 }
 
-onRemoveSelected(cell,rowIndex) {
-  console.log(this.gridApi2);
-  var selectedData = this.gridApi2.getSelectedRows();
-  console.log(this.gridApi2.getSelectedRows());
-  if(selectedData[0]==undefined){
-    alert("Please highlight the line you want to remove.");
-  }else{
-    var id = selectedData[0].id;
-    console.log(selectedData);
-    if(confirm("Are you sure you want to delete " + cell + "!")){
-    this.dataItemService.deleteData(id).subscribe(()=>{
-      var res = this.gridApi2.updateRowData({ remove: selectedData});
-      console.log(res);
-    });
-    }else{
-      console.log("false");
-    }
-  }
-}
+onGridReady(params) {
+   this.gridApi = params.api; 
+ }
+
 
 onSave(formDirective: FormGroupDirective){
 
   this.inputForm.value.date_surveyed = "2019-"+this.inputForm.value.date_surveyed+"-01";
   this.inputForm.value.comm_id = this.id;
-  this.dataItemService.saveData(this.inputForm.value).subscribe(()=>{
+  this.dataItemService.saveData(this.inputForm.value).subscribe((data: any)=>{
     if(!this.inputForm.value.id){
       console.log("add");
-      this.gridApi2.updateRowData({
-        add: [{      
+      this.gridApi.updateRowData({
+        add: [{    
+          id:  data.insertId, 
           prov: this.inputForm.value.prov,
           area: this.inputForm.value.area,
           date_surveyed: this.inputForm.value.date_surveyed,
@@ -213,7 +122,7 @@ onSave(formDirective: FormGroupDirective){
     }else{
       console.log("update");
       console.log(this.inputForm.value);
-      var rowNode = this.gridApi2.getRowNode(this.inputForm.value.id);
+      var rowNode = this.gridApi.getRowNode(this.inputForm.value.id);
       var newData = {
         prov: this.inputForm.value.prov,
         area: this.inputForm.value.area,
@@ -240,58 +149,10 @@ filterArea(event){
   });
 }
 
-  columnDefs = [
-    {headerName: 'Area', cellClass:['data','stringType'],
-    cellClassRules:{
-      indent1: function(params){
-        if(params.node.uiLevel==1) return true;
-      },
-      indent2: function(params){
-        if(params.node.uiLevel==2) return true;
-      },
-      indent3: function(params){
-        if(params.node.uiLevel==3) return true;
-      },
-      indent4: function(params){
-        if(params.node.uiLevel==4) return true;
-      },
-      indent5: function(params){
-        if(params.node.uiLevel==5) return true;
-      },
-      bold: function(params){
-        if(params.node.group) return true;
-      }
-    }, field: 'area', rowGroup: true, hide: true},
-    {headerName: 'Date Surveyed', cellClass:['data'], field: 'date_surveyed',  width: 180, valueGetter:function(params){
-      if(params.data!=undefined){
-        var data = params.data;
-        var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-        return months[new Date(data.date_surveyed).getMonth()]+" "+new Date(data.date_surveyed).getDate()+", "+new Date(data.date_surveyed).getFullYear();
-      }
-    } },
-    {headerName: 'Year', cellClass:['data'], field: 'year', width: 90, valueGetter: 'new Date(data.date_surveyed).getFullYear()', rowGroup: true, hide: true},
-    //{headerName: 'Month', field: 'month', width: 90, valueGetter: 'new Date(data.date_surveyed).getMonth() + 1', hide: true},
-    {headerName: 'Month', cellClass:['data'],field: 'month', width: 90, valueGetter: function(params){
-      var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-      if(params.data!=undefined) return months[new Date(params.data.date_surveyed).getMonth()];
-    }, rowGroup: true, hide: true},
 
-    {headerName: 'Price', field: 'price', width: 90},
-    {headerName: 'High', field: 'comp_high', width: 90},
-    {headerName: 'Low', field: 'comp_low', width: 90},
-    {headerName: 'High', field: 'high', width: 90, hide: true},
-    {headerName: 'Low', field: 'low', width: 90, hide: true},
-    {headerName: 'Respondent', field: 'respondent' },
-    {headerName: 'Supplier', field: 'supplier' },
-    {headerName: 'Remarks', field: 'remarks' },
-    {delete: 'Remarks', field: 'remarks' },
-    {headerName: 'Action', cellRenderer: 'deleteRenderer', field: 'action'}
-
-];
-
-columnDefs2 = [
-  {headerName: 'Province',cellClass:['data'], field: 'prov', rowGroup: true, hide: true,},
-  {headerName: 'Area', field: 'area', rowGroup: true, hide: true,
+columnDefs = [
+  {headerName: 'Province',cellClass:['data'], field: 'prov', rowGroup: true, hide: true},
+  {headerName: 'Area', field: 'area', rowGroup: true, hide: true, 
   cellClass:['data','stringType'],
   cellClassRules:{
     indent1: function(params){
@@ -314,7 +175,7 @@ columnDefs2 = [
     }
   },},
   {headerName: 'Date', cellClass:['data'], field: 'date_surveyed',  width: 90, hide: true},
-  {headerName: 'Date', cellClass:['data'], field: 'date_view',  width: 180, valueGetter:function(params){
+  {headerName: 'Date', pinned: 'left', cellClass:['data'], field: 'date_view',  width: 150, valueGetter:function(params){
     if(params.data!=undefined){
       var data = params.data;
       var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -326,13 +187,22 @@ columnDefs2 = [
   {headerName: 'Low', cellClass:['data'], field: 'low', width: 90,},
   {headerName: 'Action', cellClass:['data'], cellRenderer: 'actionRenderer', field: 'action'}
 ];
-frameworkComponents = {actionRenderer: ActionRenderer} ;
-frameworkComponents2 =  {deleteRenderer: DeleteRenderer} //kinvey delete
+frameworkComponents = {actionRenderer: ActionRenderer};
 context = { componentParent: this };
+autoGroupColumnDef = {
+  headerName: 'Area',
+  cellRenderer: 'agGroupCellRenderer',
+  pinned: 'left',
+  width: 180,
+  field: 'area',
+  cellRendererParams: {
+    suppressCount: true, // turn off the row count
+
+  }
+};
 
 
-  constructor(private route: ActivatedRoute, private dataItemService: DataItemService,
-    private kinveyStore: BackendService, private snackBar: MatSnackBar) { 
+  constructor(private route: ActivatedRoute, private dataItemService: DataItemService, private snackBar: MatSnackBar) { 
       this.excelStyles= [
         { id:"stringType",dataType :'string' },
         { id:"indent1",alignment :{indent:1} },
@@ -382,28 +252,23 @@ context = { componentParent: this };
             unit: new FormControl('kilo'),
             id: new FormControl(null)
           }); 
-          this.kinveyStore.getData(this.commodity.name).subscribe(res=>{
+          // this.kinveyStore.getData(this.commodity.name).subscribe(res=>{
 
-             this.rowData = res;
-             console.log(this.rowData);
-           })
+          //    this.rowData = res;
+          //    console.log(this.rowData);
+          //  })
         });
         this.dataItemService.getItem(this.id).subscribe(res=>{
-            this.rowData2 = res;
+            this.rowData = res;
             console.log(res);      
           });
      });
  
 
     this.getRowNodeId = function(data) {
-     // console.log(data);
       return data.id;
     };
 
-
-    this.getRowNodeIdKinvey = function(data) {
-      return data._id;
-    };
 
     }
 
@@ -411,33 +276,11 @@ context = { componentParent: this };
 
   }
 
- 
-
-  onRemoveSelectedKinvey(id){
-    var selectedData = this.gridApi.getRowNode(id);
-    console.log(selectedData);
-
-
-    if(confirm("Are you sure you want to delete the data?") ){
-      selectedData.data.id = id;
-      this.gridApi.updateRowData({ remove: [selectedData.data]});
-      this.kinveyStore.deleteData(id).then((result: {}) => {
-        console.log(result);
-      })
-      .catch((error) => {
-        console.log(error);
-      });;
-    }
-   
-
-
-  }
 
   editData(cell){
-    console.log(cell);
     let month = cell.date_surveyed.slice(5, -17);
-    console.log(month);
     this.newFilter = this.area;
+    console.log(this.newFilter);
     this.inputForm.patchValue({
       id: cell.id,
       prov: cell.prov,
@@ -448,6 +291,22 @@ context = { componentParent: this };
       low: cell.low
 
     });
+  }
+
+  onRemoveSelected(cell){
+    console.log(cell);
+    var result = confirm("Want to delete?");
+    if (result) {
+      this.dataItemService.deleteData(cell.id).subscribe((data: any)=>{
+        if(data.affectedRows){
+          this.gridApi.updateRowData({ remove: [cell] });
+          this.snackBar.open('Data Successfully Deleted!', 'Ok', {
+            duration: 2000,
+          });
+        }
+      })
+ 
+    }
   }
 
 }
@@ -477,7 +336,7 @@ export class ActionRenderer implements ICellRendererAngularComp {
 
   public invokeParentMethod2() {
     console.log(this.params);
-      this.params.context.componentParent.onRemoveSelected(`Row: ${this.params.rowIndex+1}\nData: Date = ${new Date(this.params.data.date_surveyed)} Price = ${this.params.data.price} High = ${this.params.data.high} Low = ${this.params.data.low}`,this.params.rowIndex)
+      this.params.context.componentParent.onRemoveSelected(this.params.data)
   }
 
   refresh(): boolean {
@@ -485,34 +344,7 @@ export class ActionRenderer implements ICellRendererAngularComp {
   }
 }
 
-@Component({
-  template: `
-  <button color="warn" *ngIf="!params.node.group" mat-button style="height: 30px"
-  (click)="invokeDeleteParent()" ><fa-icon icon="trash"></fa-icon></button>`,
-  styles: [
-      `.btn {
-          line-height: 0.5
-      }`
-  ]
-})
-export class DeleteRenderer implements ICellRendererAngularComp {
-  public params: any;
 
-  agInit(params: any): void {
-      this.params = params;
-  }
-
-
-
-  public invokeDeleteParent() {
-     console.log(this.params.data._id);
-      this.params.context.componentParent.onRemoveSelectedKinvey(this.params.data._id);
-  }
-
-  refresh(): boolean {
-      return false;
-  }
-}
 
 
 

@@ -1,45 +1,24 @@
 <div class="container">
-    <div class="row" [ngClass]="routeAnimationsElements">
-        <div *ngIf="commodity" class="col-md-12 wrapper">
-            <img   [src]="commodity.imageSrc" [alt]="commodity.name">
-        <h1 class="centered">{{commodity.category}} - {{commodity.name}}</h1>
-        </div>
+  <div class="row" [ngClass]="routeAnimationsElements">
+    <div *ngIf="commodity" class="col-md-12 wrapper">
+      <img [src]="commodity.imageSrc" [alt]="commodity.name">
+      <h1 class="centered">{{commodity.category}} - {{commodity.name}}</h1>
     </div>
-  
-    <div class="row">
-        <div class="col-md-12 wrapper">
-<mat-card [ngClass]="routeAnimationsElements">
-    <h2>Raw Data Collection (Weekly Basis)</h2>
-    <button mat-raised-button color="primary" (click)="onExport()" >Export to Excel</button>
-    <ag-grid-angular 
-    style="width: 100%; height: 500px;" 
-    class="ag-theme-balham"
-    [rowData]="rowData" 
-    [columnDefs]="columnDefs"
-    [excelStyles]="excelStyles"
-    [context]="context"
-    [rowSelection]="rowSelection"
-    [getRowNodeId]="getRowNodeIdKinvey"
-    [frameworkComponents]="frameworkComponents2"
+  </div>
+  <div *ngIf="commodity">
 
-    [groupRowAggNodes]="groupRowAggNodes"
-    [groupRemoveSingleChildren]="false"
-    [groupDefaultExpanded]=2
-    (gridReady)="onGridReady($event)"
-    >
-  </ag-grid-angular>
-
-</mat-card>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12 wrapper">
-<mat-card *ngIf="inputForm">
-    <h2> {{commodity.name}} - Data Inputting (Monthly Basis)</h2>
-    <form [formGroup]="inputForm" #formDirective="ngForm"  >
-      <table class="example-full-width" cellspacing="0"><tr>
-          <td>
-              <mat-form-field >   
+      <app-weekly-forms [commodity]="commodity"></app-weekly-forms>
+ 
+  </div>
+  <div class="row">
+    <div class="col-md-4 wrapper">
+      <mat-card *ngIf="inputForm">
+        <h2> {{commodity.name}} - Data Inputting (Monthly Basis)</h2>
+        <form [formGroup]="inputForm" #formDirective="ngForm">
+          <table class="example-full-width" cellspacing="0">
+            <tr>
+              <td>
+                <mat-form-field>
                   <mat-label>Select Province</mat-label>
                   <mat-select formControlName="prov" (selectionChange)="filterArea($event)">
                     <mat-option value="Agusan del Norte">Agusan del Norte</mat-option>
@@ -48,78 +27,82 @@
                     <mat-option value="Surigao del Sur">Surigao del Sur</mat-option>
                     <mat-option value="Dinagat Island">Dinagat Island</mat-option>
                   </mat-select>
-              </mat-form-field>  
-          </td>
-          <td>
-              <mat-form-field>   
+                </mat-form-field>
+              </td>
+              <td>
+                <mat-form-field>
                   <mat-label>Select Area</mat-label>
-                  <mat-select formControlName="area" >
-                    <mat-option *ngFor="let a of newFilter"  [value]="a.area">{{a.area}}</mat-option>
+                  <mat-select formControlName="area">
+                    <mat-option *ngFor="let a of newFilter" [value]="a.area">{{a.area}}</mat-option>
                   </mat-select>
-              </mat-form-field>   
-          </td>
-          <td>
-              <mat-form-field>   
-                  <mat-label>Select Month</mat-label>
-                  <mat-select formControlName="date_surveyed">
-                    <mat-option *ngFor="let m of month" [value]="m.value">{{m.viewValue}}</mat-option>
-                  </mat-select>
-                  <mat-hint >This is Year: 2019</mat-hint>
-              </mat-form-field>  
-          </td>
-          <td>
-              <mat-form-field>
-                  <input matInput type="number" formControlName="price" placeholder="Prevailing Price">
-              </mat-form-field>    
-          </td>
-          <td>
-              <mat-form-field>
-                  <input matInput type="number" formControlName="high" placeholder="High Price">
-              </mat-form-field>    
-          </td>
-          <td>
-              <mat-form-field>
-                  <input matInput type="number" formControlName="low" placeholder="Low Price">
-              </mat-form-field>    
-          </td>
-          <td>
-            <button type="reset"
-            mat-raised-button  (click)="reset(formDirective)">RESET</button>
-        </td>
-          <td>
-              <button [disabled]="!inputForm.valid"  
-              mat-raised-button color="primary" (click)="onSave(formDirective)">SAVE</button>
-          </td>
-        </tr>
-  </table>      
-     
-</form>
-</mat-card>
-        </div>
+                </mat-form-field>
+              </td>
+              <tr>
+                <td>
+                    <mat-form-field>
+                      <mat-label>Select Month</mat-label>
+                      <mat-select formControlName="date_surveyed">
+                        <mat-option *ngFor="let m of month" [value]="m.value">{{m.viewValue}}</mat-option>
+                      </mat-select>
+                      <mat-hint>This is Year: 2020</mat-hint>
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field>
+                      <input matInput type="number" formControlName="price" placeholder="Prevailing Price">
+                    </mat-form-field>
+                  </td>
+              </tr>
+             <tr>
+                <td>
+                    <mat-form-field>
+                      <input matInput type="number" formControlName="high" placeholder="High Price">
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field>
+                      <input matInput type="number" formControlName="low" placeholder="Low Price">
+                    </mat-form-field>
+                  </td>
+             </tr>
+             <tr>
+                <td>
+                    <button type="reset" mat-raised-button (click)="reset(formDirective)">RESET</button>
+                  </td>
+                  <td>
+                    <button [disabled]="!inputForm.valid" mat-raised-button color="primary"
+                      (click)="onSave(formDirective)">SAVE</button>
+                  </td>
+             </tr>
+    
+         
+         
+          </table>
+
+        </form>
+      </mat-card>
     </div>
-    <div class="row">
-            <div class="col-md-12 wrapper">
-    <mat-card [ngClass]="routeAnimationsElements">
-        <h2>Verified Data Collection (Monthly Basis)</h2>
-        <button mat-raised-button color="primary" (click)="onExport2()" >Export to Excel</button>
-        <ag-grid-angular 
-        style="width: 100%; height: 500px;" 
-        class="ag-theme-balham"
-        [rowData]="rowData2" 
-        [columnDefs]="columnDefs2"
-        [excelStyles]="excelStyles"
-        [groupDefaultExpanded]=-1
-        [context]="context"
-        [rowSelection]="rowSelection"
-        [getRowNodeId]="getRowNodeId"
-        [frameworkComponents]="frameworkComponents"
-        (gridReady)="onGridReady2($event)"
-        >
-      </ag-grid-angular>
-    </mat-card>
-            </div>
-        </div>
-    
+
+    <div class="col-md-8 wrapper">
+      <mat-card [ngClass]="routeAnimationsElements">
+        <h2>Verified Data Collection (Monthly Basis) <fa-icon style="color: green;" icon="file-excel" (click)="onExport()"></fa-icon></h2>
+
+        <ag-grid-angular style="width: 100%; height: 300px;" class="ag-theme-balham" 
+          [rowData]="rowData"
+          [columnDefs]="columnDefs" 
+          [excelStyles]="excelStyles" 
+          [groupDefaultExpanded]=-1 
+          [context]="context"
+          [rowSelection]="rowSelection"
+           [getRowNodeId]="getRowNodeId" 
+           [frameworkComponents]="frameworkComponents"
+          [autoGroupColumnDef]="autoGroupColumnDef" 
+          (gridReady)="onGridReady($event)">
+        </ag-grid-angular>
+
+
+      </mat-card>
+    </div>
+  </div>
+
 </div>
-    
-    
