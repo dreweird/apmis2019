@@ -5,25 +5,17 @@
         <h1 class="centered">{{commodity?.category}} - {{commodity?.name}}</h1>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-12 wrapper">
-        <mat-card [ngClass]="routeAnimationsElements">
-          <h2>Data Collection - (Monthly Basis)</h2>
-          <button mat-raised-button color="primary" (click)="onExport()" >Export to Excel</button>
-          <ag-grid-angular 
-          style="width: 100%; height: 500px;" 
-          class="ag-theme-balham"
-          [rowData]="rowData" 
-          [columnDefs]="columnDefs"
-          [autoGroupColumnDef]="autoGroupColumnDef"
-          (gridReady)="onGridReady($event)"
-          >
-        </ag-grid-angular>
-        </mat-card>
 
-      </div>
-    </div>
-  
+  <!-- <table>
+    <tr><th>date</th><th>price</th><th>1moago</th><th>3moago</th><th>yrago</th></tr>
+    <tr *ngFor="let d of data">
+      <td>{{d.date_surveyed | date:'mediumDate'}}</td>
+      <td>{{d.price}}</td>
+      <td>{{d.get1mos}}</td>
+      <td>{{d.get3mos}}</td>
+      <td>{{d.get12mos}}</td>
+    </tr>
+  </table> -->
     <div class="row" *ngIf="rowData?.length > 0">
  
         <mat-card [ngClass]="routeAnimationsElements">
@@ -49,6 +41,25 @@
 
      
 
+    </div>
+    <div class="row">
+      <div class="col-md-12 wrapper">
+        <mat-card [ngClass]="routeAnimationsElements">
+          <h2>Data Table</h2>
+          <button mat-raised-button color="primary" (click)="onExport()" >Export to Excel</button>
+          <ag-grid-angular 
+          style="width: 100%; height: 500px;" 
+          class="ag-theme-balham"
+          [rowData]="rowData" 
+          [columnDefs]="columnDefs"
+          [autoGroupColumnDef]="autoGroupColumnDef"
+          [groupDefaultExpanded]=-1
+          (gridReady)="onGridReady($event)"
+          >
+        </ag-grid-angular>
+        </mat-card>
+
+      </div>
     </div>
 
 

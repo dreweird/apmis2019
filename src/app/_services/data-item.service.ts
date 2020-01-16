@@ -12,14 +12,19 @@ export class DataItemService {
     constructor(private http: HttpClient) {}
 
     private _selectedId = -1;
-    apiRoot: string = "http://210.5.100.46:4000";
+    // apiRoot: string = "http://210.5.100.46:4000";
     //apiRoot: string = "http://172.16.130.10:4000";
-    //apiRoot: string = "http://localhost:4000";
+    apiRoot: string = "http://localhost:4000";
     allCommodity: any;
 
     getItem(id: number){
         const url = `${this.apiRoot}/getCommodity`;
         return this.http.post<any>(url, {id});
+    }
+
+    getWeekly(){
+        const url = `${this.apiRoot}/getWeekly`;
+        return this.http.get<any>(url);
     }
 
     getSelected(id: number) {
@@ -45,9 +50,18 @@ export class DataItemService {
         return this.http.post<any>(url, {item});
     }
 
+    addWeekly(item: any){
+        const url = `${this.apiRoot}/addWeekly`;
+        return this.http.post<any>(url, {item});
+    }
+
+    delWeekly(id: any){
+        const url = `${this.apiRoot}/delWeekly`;
+        return this.http.post<any>(url, {id});
+    }
+
     deleteData(id: number){
         const url = `${this.apiRoot}/deleteData`;
-       //const url = `http://localhost/apmis/api/data/read.php?get=deleteData`;
         return this.http.post<any>(url, {id});
     }
 

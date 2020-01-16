@@ -48,14 +48,17 @@ export class CommodityDetailsComponent implements OnInit, OnDestroy {
 
   columnDefs = [
     {headerName: 'Province', field: 'prov', rowGroup: true, hide: true },
-    {headerName: 'Area', field: 'area', rowGroup: true },
+    {headerName: 'Area', field: 'area', rowGroup: true, width: 120 },
     {headerName: 'Year', field: 'year', rowGroup: true, hide: true },
-    {headerName: 'Date', field: 'date_surveyed', valueFormatter : (params) => {
+    {headerName: 'Date', field: 'date_surveyed', width: 120, valueFormatter : (params) => {
        return params.value ? (this.monthNames[new Date(params.value).getMonth()] ) : '';
   } },
-    {headerName: 'Price', field: 'price'},
-    {headerName: 'High', field: 'high'},
-    {headerName: 'Low', field: 'low'}
+    {headerName: 'Prevailing Price', field: 'price'},
+    {headerName: 'A Month Ago', field: 'get1mos'},
+    {headerName: '3 Months Ago', field: 'get3mos'},
+    {headerName: 'A Year Ago', field: 'get12mos', width: 70},
+    {headerName: 'High', field: 'high', width: 70},
+    {headerName: 'Low', field: 'low', width: 70}
 ];
 
 autoGroupColumnDef = {
@@ -101,8 +104,8 @@ onGridReady(params) {
   
       this.dataItemService.getItem(this.id).subscribe(res=>{
         console.log(res);
-        this.rowData = res;
-        if(this.rowData.length > 0){
+       // this.rowData = res;
+        if(res.length > 0){
           this.processData(this.selected);
         }
       });
@@ -143,10 +146,11 @@ onGridReady(params) {
 
   }
 
-
+data: any;
   processData(area){
     console.log(area);
     this.dataItemService.get3MosAgo(this.id, area).subscribe(res=>{
+      this.rowData = res;
      console.log(res);
       for(let entry of res){
         this.dataPoints.push({
@@ -179,6 +183,7 @@ onGridReady(params) {
     this.chart = new CanvasJS.Chart("chartContainer", {
       animationEnabled: true,
       exportEnabled: true,
+      zoomEnabled: true,
       title: {
         text: "Prevailing Price vs Prevailing Price A Month Ago",
         fontColor: "#388e3c"
@@ -201,15 +206,14 @@ onGridReady(params) {
       legend: {
         cursor: "pointer",
         verticalAlign: "top",
-        horizontalAlign: "center",
-        dockInsidePlotArea: true
+        horizontalAlign: "center"
       },
       data: [{
         type:"line",
         axisYType: "secondary",
         name: "Prevailing Price",
         showInLegend: true,
-        markerSize: 0,
+        markerType: 'circle',
         yValueFormatString: "₱#,###",
         dataPoints: this.dataPoints
       },
@@ -218,7 +222,7 @@ onGridReady(params) {
         axisYType: "secondary",
         name: "Prevailing Price A Month Ago",
         showInLegend: true,
-        markerSize: 0,
+        markerType: 'circle',
         yValueFormatString: "₱#,###",
         dataPoints: this.monthAgo
       }]
@@ -228,6 +232,7 @@ onGridReady(params) {
     this.chart2 = new CanvasJS.Chart("chartContainer2", {
       animationEnabled: true,
       exportEnabled: true,
+      zoomEnabled: true,
       title: {
         text: "Prevailing Price vs Prevailing Price 3 Months Ago",
         fontColor: "#388e3c"
@@ -250,15 +255,14 @@ onGridReady(params) {
       legend: {
         cursor: "pointer",
         verticalAlign: "top",
-        horizontalAlign: "center",
-        dockInsidePlotArea: true
+        horizontalAlign: "center"
       },
       data: [{
         type:"line",
         axisYType: "secondary",
         name: "Prevailing Price",
         showInLegend: true,
-        markerSize: 0,
+        markerType: 'circle',
         yValueFormatString: "₱#,###",
         dataPoints: this.dataPoints
       },
@@ -267,7 +271,7 @@ onGridReady(params) {
         axisYType: "secondary",
         name: "Prevailing Price 3 Months Ago",
         showInLegend: true,
-        markerSize: 0,
+        markerType: 'circle',
         yValueFormatString: "₱#,###",
         dataPoints: this.month3Ago
       }]
@@ -277,6 +281,7 @@ onGridReady(params) {
     this.chart3 = new CanvasJS.Chart("chartContainer3", {
       animationEnabled: true,
       exportEnabled: true,
+      zoomEnabled: true,
       title: {
         text: "Prevailing Price vs Prevailing Price A Year Ago",
         fontColor: "#388e3c"
@@ -299,15 +304,14 @@ onGridReady(params) {
       legend: {
         cursor: "pointer",
         verticalAlign: "top",
-        horizontalAlign: "center",
-        dockInsidePlotArea: true
+        horizontalAlign: "center"
       },
       data: [{
         type:"line",
         axisYType: "secondary",
         name: "Prevailing Price",
         showInLegend: true,
-        markerSize: 0,
+        markerType: 'circle',
         yValueFormatString: "₱#,###",
         dataPoints: this.dataPoints
       },
@@ -316,7 +320,7 @@ onGridReady(params) {
         axisYType: "secondary",
         name: "Prevailing Price A Year Ago",
         showInLegend: true,
-        markerSize: 0,
+        markerType: 'circle',
         yValueFormatString: "₱#,###",
         dataPoints: this.yearAgo
       }]
@@ -326,10 +330,10 @@ onGridReady(params) {
 
   ngOnDestroy() {
     this.sub.unsubscribe();
-    if(this.chart) {
-      this.chart.destroy();
-      this.chart = null;
-    }
+    // if(this.chart) {
+    //   this.chart.destroy();
+    //   this.chart = null;
+    // }
   }
 
 

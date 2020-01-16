@@ -53,7 +53,8 @@ import {
   faStream,
   faBook,
   faKey,
-  faSearch
+  faSearch,
+  faFileExcel
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faGithub,
@@ -65,6 +66,7 @@ import {
 
 
 library.add(
+  faFileExcel,
   faBars,
   faUserCircle,
   faPowerOff,

@@ -54,7 +54,8 @@
         </mat-toolbar>
       </div>
       <div class="content" [@routeAnimations]="o.isActivated && o.activatedRoute.routeConfig.path">
-          
+        <!-- <div #chartContainer id="chartContainer" style="height: 370px; width: 100%; margin-left:auto;margin-right:auto;"></div> -->
+
         <router-outlet #o="outlet"></router-outlet>
         </div>
       <div class="footer">
