@@ -20,9 +20,9 @@ app.listen(PORT,'localhost', () =>
 );
 
 var db_config = {
-    host : 'localhost',
-    user : 'root',
-    password : '',
+    host : '172.16.130.8',
+    user : 'pmis',
+    password : 'pmis',
     database : 'apmis'
  }
  
@@ -61,7 +61,9 @@ SELECT * FROM commodity inner join price on commodity.id = price.commodity_id gr
 
 app.get('/getWeekly',  function(req,res){ 
 	connection.query(`
-	SELECT * FROM commodity inner join weekly on commodity.id = weekly.commodity_id`, function (error, results) {
+	SELECT *, MONTH(date_surveyed) as month, year(date_surveyed) as year, CONCAT( YEAR( date_surveyed ) , "-", MONTH( date_surveyed ) , "-01")as firstday, 
+	WEEK( date_surveyed, 0 ) - WEEK( CONCAT( YEAR( date_surveyed ) , "-", MONTH( date_surveyed ) , "-1" ) , 0 ) +1 AS week
+	FROM commodity inner join weekly on commodity.id = weekly.commodity_id order by date_surveyed`, function (error, results) {
 		if (error) throw error;
 		res.json(results); 
 	  });
