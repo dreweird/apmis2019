@@ -39,7 +39,17 @@ export class WeeklyTableComponent implements OnInit {
       }
     },},
     {headerName: 'Date', cellClass:['data'], field: 'date_surveyed',  width: 90, hide: true},
-    {headerName: 'Date', pinned: 'left', cellClass:['data'], field: 'date_view',  width: 150, valueGetter:function(params){
+    {headerName: 'First Day', cellClass:['data'], field: 'firstday',  rowGroup:true, hide: true, width: 150, valueGetter:function(params){
+      if(params.data!=undefined){
+        var data = params.data;
+        var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        return months[new Date(data.date_surveyed).getMonth()]+", "+new Date(data.date_surveyed).getFullYear();
+      }
+    }},
+    {headerName: 'Week', cellClass:['data'], field: 'week',  width: 90,rowGroup: true, hide: true, valueGetter:function(params){
+      if(params.data!=undefined) return "Week "+params.data.week;
+    }},
+    {headerName: 'Date', pinned: 'left', cellClass:['data'], field: 'date_view', hide: true, width: 150, valueGetter:function(params){
       if(params.data!=undefined){
         var data = params.data;
         var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -47,6 +57,8 @@ export class WeeklyTableComponent implements OnInit {
       }
     }},
     {headerName: 'Price', cellClass:['data'], field: 'price', width: 90},
+    {headerName: 'High', cellClass:['data'], field: 'comp_high',  width: 90, hide: false},
+    {headerName: 'Low', cellClass:['data'], field: 'comp_low',  width: 90, hide: false},
     {headerName: 'Seller', cellClass:['data'], field: 'seller', width: 90},
     {headerName: 'Supplier', cellClass:['data'], field: 'supplier', width: 90},
     {headerName: 'Remarks', cellClass:['data'], field: 'remarks', width: 90},
@@ -56,11 +68,11 @@ export class WeeklyTableComponent implements OnInit {
 
   context = { componentParent: this };
   autoGroupColumnDef = {
-    headerName: 'Area',
+    headerName: 'Group',
     cellRenderer: 'agGroupCellRenderer',
     pinned: 'left',
-    width: 180,
-    field: 'area',
+    width: 200,
+    field: '',
     cellRendererParams: {
       suppressCount: true, // turn off the row count
   
@@ -147,6 +159,91 @@ export class WeeklyTableComponent implements OnInit {
         })
    
       }
+    }
+
+
+    groupRowAggNodes(nodes: any) {
+      const result = {
+        price: 0,
+        comp_high: 0,
+        comp_low: 0,
+      };
+      const result_ = {
+        price: 0,
+        comp_high: 0,
+        comp_low: 0,
+      };
+      // console.log(nodes);
+      // console.log("-----------------");
+      nodes.forEach(function(node: any) {
+        // console.log(node);
+        if(!node.group){
+          var price=0;
+          var arr1 = [];
+          var children = node.parent.childrenAfterGroup;
+          //console.log(node.key);
+          children.forEach(function(child: any){
+            //console.log(child);
+            arr1.push(child.data.price);
+          });
+          var mf = 0;
+          var m = 0;
+          var item;
+          for (var i=0; i<arr1.length; i++){
+            for (var j=i; j<arr1.length; j++){
+              if (arr1[i] == arr1[j]) m++;
+              if (mf<m){
+                mf=m; 
+                item = arr1[i];
+              }
+            }
+            m=0;
+            }
+          var sum = 0;
+          for( var i = 0; i < arr1.length; i++ ){
+              sum += parseInt( arr1[i], 10 );
+          }
+          result.price= sum/arr1.length;
+          result.comp_high= Math.max.apply(null,arr1);
+          result.comp_low= Math.min.apply(null,arr1);
+        }
+
+        
+      });
+      if(nodes.length>0&&(nodes[0].parent.field=="week")){
+        return result;
+      }
+      if(nodes.length>0&&(nodes[0].parent.field=="firstday")){
+        var node = nodes[0].parent;
+        var _price=0;
+        var _arr1 = [];
+        var _children = node.allLeafChildren;
+        _children.forEach(function(_child: any){
+          _arr1.push(_child.data.price);
+        });
+        // var _mf = 0;
+        // var _m = 0;
+        // var _item;
+        // for (var _i=0; _i<_arr1.length; _i++){
+        //   for (var _j=_i; _j<_arr1.length; _j++){
+        //     if (_arr1[_i] == _arr1[_j]) _m++;
+        //     if (_mf<_m){
+        //       _mf=_m; 
+        //       _item = _arr1[_i];
+        //     }
+        //   }
+        //   _m=0;
+        //   }
+        var _sum = 0;
+        for( var i = 0; i < _arr1.length; i++ ){
+            _sum += parseInt( _arr1[i], 10 );
+        }
+        result_.price= _sum / _arr1.length;
+        result_.comp_high= Math.max.apply(null,_arr1);
+        result_.comp_low= Math.min.apply(null,_arr1);
+        return result_;
+      }
+      
     }
   
 
